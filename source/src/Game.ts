@@ -1,6 +1,6 @@
 import * as geom from "./Geom";
 import {Body} from "./Body";
-import {Person} from "./Person";
+import {Entity} from "./Entity";
 import {Control, Keys} from "./Control";
 import {Draw, Color} from "./Draw";
 import { Tile, CollisionType } from "./Tile";
@@ -11,7 +11,7 @@ export class Game {
     public draw : Draw;
     private bodies : Body [] = [];
     private brains : Brain [] = [];
-    public people : Person [] = [];
+    public entities : Entity [] = [];
     public grid : Tile [][] = [];
     public playerID = 0;
 
@@ -46,12 +46,12 @@ export class Game {
     }
 
     public make_person(body : Body, brain : Brain) {
-        return this.people[this.people.length] = new Person(body, brain);
+        return this.entities[this.entities.length] = new Entity(body, brain);
     }
 
     public step() {
-        for (let i = 0; i < this.people.length; i++) {
-            this.people[i].brain.bodyControl();
+        for (let i = 0; i < this.entities.length; i++) {
+            this.entities[i].brain.bodyControl();
         }
     }
 
@@ -95,8 +95,8 @@ export class Game {
         }
 
         // People
-        for (let i = 0; i < this.people.length; i++) {
-            this.draw.image(this.people[i].animation.current_state, this.people[i].body.center, new geom.Vector(1, 1));
+        for (let i = 0; i < this.entities.length; i++) {
+            this.draw.image(this.entities[i].animation.current_state, this.entities[i].body.center, new geom.Vector(1, 1));
         }
     }
 }
