@@ -1,10 +1,10 @@
 import * as geom from "./Geom";
-import {Body} from "./Body";
-import {Entity} from "./Entity";
+import {Body} from "./Entities/EntityAttributes/Body";
+import {Entity} from "./Entities/Entity";
 import {Control, Keys} from "./Control";
 import {Draw, Color} from "./Draw";
 import { Tile, CollisionType } from "./Tile";
-import { Brain } from "./Brain";
+import { Brain } from "./Entities/EntityAttributes/Brain";
 
 export class Game {
     public tileSize = 1

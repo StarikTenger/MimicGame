@@ -7,6 +7,7 @@ import { Camera } from "../../Draw";
 export class Brain {
     public personID : number;
     public game : Game;
+    public takeControl : boolean = false;
     
     constructor(game : Game, personID : number) {
         this.game = game;
@@ -40,7 +41,7 @@ export class Brain {
                     let isMouseOn = this.game.entities[i].body.center.sub(coords).abs();
                     //console.log("cords: ", coords, "isMouseOn: ", isMouseOn, "MyCenter: ", this.game.people[this.personID].body.center);
                     if ((centerDistance < infectionRadius) && (isMouseOn < this.game.entities[i].body.radius) && (i != this.personID)) {
-                        this.game.playerID = i;
+                        this.game.playerID = i;   
                         break;
                     }
                 }
