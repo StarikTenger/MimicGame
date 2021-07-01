@@ -1,6 +1,6 @@
-import * as geom from "./Geom";
-import { Game } from "./Game";
-import {Tile, CollisionType} from "./Tile";
+import * as geom from "../../Geom";
+import { Game } from "../../Game";
+import {Tile, CollisionType} from "../../Tile";
 
 export class Body {
     public center : geom.Vector;

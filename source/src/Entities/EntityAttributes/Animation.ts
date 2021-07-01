@@ -1,4 +1,4 @@
-import { Draw } from "./Draw";
+import { Draw } from "../../Draw";
 
 export class Animation {
     public current_state : HTMLImageElement;

@@ -1,8 +1,8 @@
-import { Game } from "./Game";
-import { Control, Keys } from "./Control";
-import * as geom from "./Geom";
-import { Entity } from "./Entity";
-import { Camera } from "./Draw";
+import { Game } from "../../Game";
+import { Control, Keys } from "../../Control";
+import * as geom from "../../Geom";
+import { Entity } from "../Entity";
+import { Camera } from "../../Draw";
 
 export class Brain {
     public personID : number;
