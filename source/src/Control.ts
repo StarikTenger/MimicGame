@@ -1,4 +1,5 @@
 import * as geom from "./Geom";
+import { Map } from "./AuxLib";
 
 export enum Keys {
     LeftArrow = 37,
@@ -11,6 +12,7 @@ export class Control {
     private static _keys : boolean[] = [];
     private static clicked = false;
     private static mouseCoordinates = new geom.Vector(0, 0);
+    public static commands : Map;
 
     public static init() : void {
         for (let i = 0; i < 256; i++) {
