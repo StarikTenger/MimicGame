@@ -11,8 +11,11 @@ export class Mimic {
         this.game = game;
     }
 
-    private takeControl() {
-        
+    public takeControl(newID : number) {
+        this.game.entities[this.currentID].brain.AIcontrol();
+        this.game.playerID = newID;
+        this.currentID = newID;
+        this.game.entities[this.currentID].brain.PlayerControl();
     }
 
     public step() {
@@ -27,7 +30,7 @@ export class Mimic {
                 let isMouseOn = this.game.entities[i].body.center.sub(coords).abs();
                 //console.log("cords: ", coords, "isMouseOn: ", isMouseOn, "MyCenter: ", this.game.people[this.personID].body.center);
                 if ((centerDistance < this.infectionRadius) && (isMouseOn < this.game.entities[i].body.radius) && (i != this.currentID)) {
-                    this.game.playerID = i;   
+                    this.takeControl(i);   
                     break;
                 }
             }

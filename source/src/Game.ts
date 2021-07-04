@@ -5,6 +5,7 @@ import {Control, Keys} from "./Control";
 import {Draw, Color} from "./Draw";
 import { Tile, CollisionType } from "./Tile";
 import { Brain } from "./Entities/EntityAttributes/Brain";
+import { Mimic } from "./Mimic";
 
 export class Game {
     public tileSize = 1
@@ -14,8 +15,11 @@ export class Game {
     public entities : Entity [] = [];
     public grid : Tile [][] = [];
     public playerID = 0;
+    public mimic : Mimic
 
     constructor(draw : Draw) {
+        console.log("im here!!");
+        
         Control.init();
         this.draw = draw;
 
@@ -27,6 +31,8 @@ export class Game {
                 this.grid[x][y] = new Tile();
             }
         }
+
+        this.mimic = new Mimic(this);
 
         this.grid[0][0] = new Tile(CollisionType.CornerDR);
         this.grid[1][1] = new Tile(CollisionType.CornerUL);
@@ -51,7 +57,7 @@ export class Game {
 
     public step() {
         for (let i = 0; i < this.entities.length; i++) {
-            this.entities[i].brain.bodyControl();
+            this.entities[i].brain.step();
         }
     }
 

@@ -6,6 +6,7 @@ export class Body {
     public center : geom.Vector;
     public radius : number;
     public game : Game;
+    public velocity = 0.01
 
     constructor(center : geom.Vector, radius:number) {
         this.center = center;
