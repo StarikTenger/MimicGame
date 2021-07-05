@@ -59,7 +59,7 @@ define("Control", ["require", "exports", "Geom"], function (require, exports, ge
     var Control = (function () {
         function Control() {
         }
-        Control.load_config = function (path) {
+        Control.loadConfig = function (path) {
             var file;
             var fs = require('fs');
             fs.readFile(path, function (err, data) {
@@ -74,9 +74,28 @@ define("Control", ["require", "exports", "Geom"], function (require, exports, ge
                 type = currentString[0];
                 for (var j = 1; j < currentString.length; j++) {
                     var currentKey = parseInt(currentString[j]);
-                    this.keyMapping[currentKey][this.keyMapping[currentKey].length] = type;
+                    Control.keyMapping[currentKey][Control.keyMapping[currentKey].length] = type;
                 }
+                Control.commands[type] = false;
             }
+        };
+        Control.fakeLoadConfig = function () {
+            Control.keyMapping[38] = [];
+            Control.keyMapping[38][0] = "MoveUp";
+            Control.commandsCounter["MoveUp"] = 0;
+            Control.commands["MoveUp"] = false;
+            Control.keyMapping[40] = [];
+            Control.keyMapping[40][0] = "MoveDown";
+            Control.commandsCounter["MoveDown"] = 0;
+            Control.commands["MoveDown"] = false;
+            Control.keyMapping[39] = [];
+            Control.keyMapping[39][0] = "MoveRight";
+            Control.commandsCounter["MoveRight"] = 0;
+            Control.commands["MoveRight"] = false;
+            Control.keyMapping[37] = [];
+            Control.keyMapping[37][0] = "MoveLeft";
+            Control.commandsCounter["MoveLeft"] = 0;
+            Control.commands["MoveLeft"] = false;
         };
         Control.init = function () {
             for (var i = 0; i < 256; i++) {
@@ -86,44 +105,56 @@ define("Control", ["require", "exports", "Geom"], function (require, exports, ge
             window.addEventListener("keyup", Control.onKeyUp);
             window.addEventListener("click", Control.onClick);
             console.log("lets do it!!");
-            this.keyMapping = new Map();
-            this.commandsCounter = new Map();
-            this.commands = new Map();
-            this.load_config("env/keys.conf");
-            console.log("Done!!", this.keyMapping);
+            Control.keyMapping = new Map();
+            Control.commandsCounter = new Map();
+            Control.commands = new Map();
+            Control.fakeLoadConfig();
+            console.log("Done!!", Control.keyMapping);
+            console.log(Control.commands["MoveUp"]);
+            console.log(Control.commands);
         };
         Control.isKeyDown = function (key) {
             return Control._keys[key];
         };
         Control.isMouseClicked = function () {
-            return this.clicked;
+            return Control.clicked;
         };
         Control.lastMouseCoordinates = function () {
-            this.clicked = false;
-            return this.mouseCoordinates;
+            Control.clicked = false;
+            return Control.mouseCoordinates;
         };
         Control.onKeyDown = function (event) {
+            if (Control.keyMapping != undefined && Control._keys[event.keyCode] == false) {
+                console.log(event.key, Control.keyMapping, Control.keyMapping[event.keyCode]);
+                if (Control.keyMapping[event.keyCode] == undefined) {
+                    Control.keyMapping[event.keyCode] = [];
+                }
+                for (var i = 0; i < Control.keyMapping[event.keyCode].length; i++) {
+                    var currentCommand = Control.keyMapping[event.keyCode][i];
+                    Control.commandsCounter[currentCommand]++;
+                    Control.commands[currentCommand] = (Control.commandsCounter[currentCommand] != 0);
+                    console.log(currentCommand, Control.commandsCounter[currentCommand], Control.commands[currentCommand]);
+                }
+            }
             Control._keys[event.keyCode] = true;
             console.log(event.key);
-            console.log(event.key);
-            for (var i = 0; i < this.keyMapping.get(event.keyCode).length; i++) {
-                var currentCommand = this.keyMapping[event.keyCode][i];
-                this.commandsCounter[currentCommand]++;
-                this.commands[currentCommand] = (this.commandsCounter[currentCommand] != 0);
-            }
+            console.log(Control.commandsCounter);
             event.preventDefault();
             event.stopPropagation();
             return false;
         };
         Control.onKeyUp = function (event) {
-            Control._keys[event.keyCode] = false;
-            if (this.keyMapping != undefined) {
-                for (var i = 0; i < this.keyMapping[event.keyCode]; i++) {
-                    var currentCommand = this.keyMapping[event.keyCode][i];
-                    this.commandsCounter[currentCommand]--;
-                    this.commands[currentCommand] = (this.commandsCounter[currentCommand] != 0);
+            if (Control.keyMapping != undefined && Control._keys[event.keyCode] == true) {
+                if (Control.keyMapping[event.keyCode] == undefined) {
+                    Control.keyMapping[event.keyCode] = [];
+                }
+                for (var i = 0; i < Control.keyMapping[event.keyCode].length; i++) {
+                    var currentCommand = Control.keyMapping[event.keyCode][i];
+                    Control.commandsCounter[currentCommand]--;
+                    Control.commands[currentCommand] = (Control.commandsCounter[currentCommand] != 0);
                 }
             }
+            Control._keys[event.keyCode] = false;
             event.preventDefault();
             event.stopPropagation();
             return false;
@@ -313,7 +344,7 @@ define("Entities/EntityAttributes/Brain", ["require", "exports", "Control", "Geo
             if (this.commands["MoveRight"]) {
                 this.game.entities[this.entityID].body.move(new geom.Vector(vel, 0));
             }
-            if (this.commands["MoveRight"]) {
+            if (this.commands["MoveLeft"]) {
                 this.game.entities[this.entityID].body.move(new geom.Vector(-vel, 0));
             }
         };
@@ -424,6 +455,7 @@ define("Game", ["require", "exports", "Geom", "Entities/EntityAttributes/Body", 
             return this.entities[this.entities.length] = new Entity_1.Entity(body, brain);
         };
         Game.prototype.step = function () {
+            this.mimic.step();
             for (var i = 0; i < this.entities.length; i++) {
                 this.entities[i].brain.step();
             }

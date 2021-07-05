@@ -56,6 +56,7 @@ export class Game {
     }
 
     public step() {
+        this.mimic.step();
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].brain.step();
         }

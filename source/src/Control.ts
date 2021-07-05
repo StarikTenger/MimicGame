@@ -16,7 +16,7 @@ export class Control {
     private static commandsCounter : Map<string, number>;
     public static commands : Map<string, boolean>;
 
-    public static load_config(path : string) {
+    public static loadConfig(path : string) {
         let file : string[];
         const fs = require('fs');
         fs.readFile(path, function (err, data) {
@@ -32,9 +32,29 @@ export class Control {
             type = currentString[0];
             for (let j = 1; j < currentString.length; j++) {
                 let currentKey = parseInt(currentString[j]);
-                this.keyMapping[currentKey][this.keyMapping[currentKey].length] = type;
+                Control.keyMapping[currentKey][Control.keyMapping[currentKey].length] = type;
             }
+            Control.commands[type] = false;
         }
+    }
+    
+    public static fakeLoadConfig() {
+        Control.keyMapping[38] = [];
+        Control.keyMapping[38][0] = "MoveUp";
+        Control.commandsCounter["MoveUp"] = 0;
+        Control.commands["MoveUp"] = false;
+        Control.keyMapping[40] = [];
+        Control.keyMapping[40][0] = "MoveDown";
+        Control.commandsCounter["MoveDown"] = 0;
+        Control.commands["MoveDown"] = false;
+        Control.keyMapping[39] = [];
+        Control.keyMapping[39][0] = "MoveRight";
+        Control.commandsCounter["MoveRight"] = 0;
+        Control.commands["MoveRight"] = false;
+        Control.keyMapping[37] = [];
+        Control.keyMapping[37][0] = "MoveLeft";
+        Control.commandsCounter["MoveLeft"] = 0;
+        Control.commands["MoveLeft"] = false;
     }
 
     public static init() : void {
@@ -47,12 +67,16 @@ export class Control {
         
         console.log("lets do it!!");
         
-        this.keyMapping = new Map<number, string[]>();
-        this.commandsCounter = new Map<string, number>();
-        this.commands = new Map<string, boolean>();
-        this.load_config("env/keys.conf");
+        Control.keyMapping = new Map<number, string[]>();
+        Control.commandsCounter = new Map<string, number>();
+        Control.commands = new Map<string, boolean>();
+        //Control.loadConfig("env/keys.conf");
+        Control.fakeLoadConfig();
 
-        console.log("Done!!", this.keyMapping);
+        console.log("Done!!", Control.keyMapping);
+        console.log(Control.commands["MoveUp"]);
+        console.log(Control.commands);
+        
     }
 
     public static isKeyDown(key : Keys) : boolean {
@@ -60,39 +84,47 @@ export class Control {
     }
 S
     public static isMouseClicked() : boolean {
-        return this.clicked;
+        return Control.clicked;
     }
 
     public static lastMouseCoordinates() : geom.Vector {
-        this.clicked = false;
-        return this.mouseCoordinates;
+        Control.clicked = false;
+        return Control.mouseCoordinates;
     }
 
     private static onKeyDown(event : KeyboardEvent) : boolean {
+        if (Control.keyMapping != undefined && Control._keys[event.keyCode] == false) {
+            console.log(event.key, Control.keyMapping, Control.keyMapping[event.keyCode]);
+            if (Control.keyMapping[event.keyCode] == undefined) {
+                Control.keyMapping[event.keyCode] = [];
+            }
+            for (let i = 0; i < Control.keyMapping[event.keyCode].length; i++) {
+                let currentCommand = Control.keyMapping[event.keyCode][i];
+                Control.commandsCounter[currentCommand]++;
+                Control.commands[currentCommand] = (Control.commandsCounter[currentCommand] != 0);
+                console.log(currentCommand, Control.commandsCounter[currentCommand], Control.commands[currentCommand]);
+            }
+        }
         Control._keys[event.keyCode] = true;
         console.log(event.key);
-        //if (this.keyMapping != undefined) {
-            console.log(event.key);
-            for (let i = 0; i < this.keyMapping.get(event.keyCode).length; i++) {
-                let currentCommand = this.keyMapping[event.keyCode][i];
-                this.commandsCounter[currentCommand]++;
-                this.commands[currentCommand] = (this.commandsCounter[currentCommand] != 0);
-            }
-        //}
+        console.log(Control.commandsCounter);
         event.preventDefault();
         event.stopPropagation();
         return false;
     }
 
     private static onKeyUp(event : KeyboardEvent) : boolean {
-        Control._keys[event.keyCode] = false;
-        if (this.keyMapping != undefined) {
-            for (let i = 0; i < this.keyMapping[event.keyCode]; i++) {
-                let currentCommand = this.keyMapping[event.keyCode][i];
-                this.commandsCounter[currentCommand]--;
-                this.commands[currentCommand] = (this.commandsCounter[currentCommand] != 0);
+        if (Control.keyMapping != undefined && Control._keys[event.keyCode] == true) {
+            if (Control.keyMapping[event.keyCode] == undefined) {
+                Control.keyMapping[event.keyCode] = [];
+            }
+            for (let i = 0; i < Control.keyMapping[event.keyCode].length; i++) {
+                let currentCommand = Control.keyMapping[event.keyCode][i];
+                Control.commandsCounter[currentCommand]--;
+                Control.commands[currentCommand] = (Control.commandsCounter[currentCommand] != 0);
             }
         }
+        Control._keys[event.keyCode] = false;
         event.preventDefault();
         event.stopPropagation();
         return false;

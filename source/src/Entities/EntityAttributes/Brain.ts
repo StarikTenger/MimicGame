@@ -36,7 +36,7 @@ export class Brain {
         if(this.commands["MoveRight"]) {
             this.game.entities[this.entityID].body.move(new geom.Vector(vel, 0));
         }
-        if(this.commands["MoveRight"]) {
+        if(this.commands["MoveLeft"]) {
             this.game.entities[this.entityID].body.move(new geom.Vector(-vel, 0));
         }   
     }
